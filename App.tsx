@@ -5,8 +5,8 @@
  * @format
  */
 
-import React, { useState } from 'react';
-import type { PropsWithChildren } from 'react';
+import React, {useState} from 'react';
+import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,7 +16,8 @@ import {
   useColorScheme,
   View,
   TextInput,
-  Button
+  Button,
+  FlatList,
 } from 'react-native';
 
 import {
@@ -31,8 +32,6 @@ type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
-
-
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -41,33 +40,46 @@ function App(): JSX.Element {
   };
 
   const [goal, setGoal] = useState('');
-  const [courseGoal, setCourseGoal] = useState([])
+  const [courseGoal, setCourseGoal] = useState([]);
 
   function goalInputHandler(text) {
-    setGoal(text)
+    setGoal(text);
   }
   function addGoalHandler() {
-    console.log(goal)
-    setCourseGoal((currentGoals) => [...currentGoals, goal]);
+    console.log(goal);
+    setCourseGoal(currentGoals => [
+      ...currentGoals,
+      {text: goal, id: Math.random().toString()},
+    ]);
   }
 
   return (
     <View style={styles.appContainer}>
       <View style={styles.inputContainer}>
         <TextInput
-          placeholder='your Course Goal!'
+          placeholder="your Course Goal!"
           style={styles.textInput}
           onChangeText={goalInputHandler}
         />
-        <Button title='Add Goal' onPress={addGoalHandler} />
+        <Button title="Add Goal" onPress={addGoalHandler} />
       </View>
 
       <View style={styles.goalInput}>
-        {courseGoal.map((el, i) => (
-          <Text style={styles.goalItem} key={i}>{el}</Text>
-        ))}
+        <FlatList
+          data={courseGoal}
+          renderItem={(itemData: any) => {
+            return (
+              <View style={styles.goalItem}>
+                <Text style={styles.goalText}>{itemData.item.text}</Text>
+              </View>
+            );
+          }}
+          keyExtractor={(item, i) => {
+            return item.id;
+          }}
+          alwaysBounceVertical={false}
+        />
       </View>
-
     </View>
   );
 }
@@ -76,7 +88,7 @@ const styles = StyleSheet.create({
   appContainer: {
     paddingTop: 70,
     paddingHorizontal: 16,
-    flex: 1
+    flex: 1,
   },
   inputContainer: {
     flex: 1,
@@ -86,14 +98,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderBottomWidth: 1,
     borderColor: '#ccc',
-
   },
   textInput: {
     borderWidth: 1,
     borderColor: '#ccc',
     width: '70%',
-    padding: 10
-
+    padding: 10,
   },
   goalInput: {
     flex: 4,
@@ -103,8 +113,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#5e0acc',
     padding: 8,
-    color: '#fff'
-  }
+  },
+  goalText: {
+    color: '#fff',
+  },
 });
 
 export default App;
